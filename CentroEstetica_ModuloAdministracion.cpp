@@ -4,14 +4,15 @@
 #include <conio.h>
 #include <ctype.h>
 
-struct Usuarios
+
+struct Usuarios					//Sector del registro
 {
 	char Usuario[10];
 	char Contrasena[32];
 	char ApellidoYNombre[60];
 };
 
-int Menu()
+int Menu()					//Funcion del menú
 {
 	int opcion = 0;
 	
@@ -29,444 +30,96 @@ int Menu()
 	return opcion;
 }
 
+bool VerificarNombreDeUsuario(Usuarios regi);
+bool ComienzaMinuscula(Usuarios regi);
+bool ContieneDosMayusculas(Usuarios regi);
+bool ContieneMaximoTresDigitos(Usuarios regi);
 
-void RegistrarProfesional(FILE *Profesionales)
+															//Seccion de prototipos de funciones para la creacion del nuevo usuario
+bool VerificarContrasenia(Usuarios regi);						
+bool ContraseniaMayusculaMinusculaNumero(Usuarios regi);
+bool ContraseniaSignosEspeciales(Usuarios regi);
+bool TresNumerosConsecutivos(Usuarios regi);
+bool DosLetrasConsecutivas(Usuarios regi);
+
+void RegistrarProfesional(FILE *archi)		//Registrar Profesionales en el archivo
 {
 	Usuarios profesionales;
-	int longitudNombreUsuario;
-	int longitudContrasena;
-	int CantidadMayusculasNombreUsuario;
-	int CantidadDigitosNombreUsuario;
-	char cadenaMinuscula[32];
-	int i = 0;
-	int j = 0;
-	int k = 0;
-	int l = 0;
-	int p = 0;
-	int u = 0;
 	
-	Profesionales = fopen("Profesionales.dat", "r+b");
 	
-	if (Profesionales == NULL)
+	
+	archi = fopen("Profesionales.dat", "r+b");
+	
+	if (archi == NULL)
 	{
-		Profesionales = fopen("Profesionales.dat", "w+b");
+		archi = fopen("Profesionales.dat", "w+b");
 		
-		if (Profesionales == NULL)
+		if (archi == NULL)
 		{
 			printf("Error. No se pudo crear el archivo");
 			exit(1);
 		}
 	}
 	
-	
-	printf("Ingrese nombre de usuario de nuevo profesional: ");
+	printf("Ingrese el nombre de Usuario del nuevo Profesional: ");
 	_flushall();
-	gets(profesionales.Usuario);
-	longitudNombreUsuario = strlen(profesionales.Usuario);
-	while((longitudNombreUsuario < 6) || (longitudNombreUsuario > 10))
-	{
-		printf("\nEl nombre de usuario debe contener entre 6 y 10 caracteres");
-		printf("\nIngrese otro nombre de usuario: ");
-		_flushall();
-		gets(profesionales.Usuario);
-		longitudNombreUsuario = strlen(profesionales.Usuario);
-	}
+	gets(profesionales.ApellidoYNombre);
 	
-	if(!islower(profesionales.Usuario[0]))
+	while(!VerificarNombreDeUsuario(profesionales))
 	{
-		printf("\nEl nombre de usuario debe empezar con una letra minuscula");
-		printf("\nIngrese otro nombre de usuario: ");
-		_flushall();
-		gets(profesionales.Usuario);
-		longitudNombreUsuario = strlen(profesionales.Usuario);
-	}
-	
-	
-	while(profesionales.Usuario[i] != '\0')
-	{
-		if(isupper(profesionales.Usuario[i]))
-		{
-			CantidadMayusculasNombreUsuario++;
-			
-		}
-	i++;
-	}
-	
-	while(CantidadMayusculasNombreUsuario < 2)
-	{
-		printf("\nEl nombre de usuario debe tener al menos dos letras mayusculas");
-		printf("\nIngrese otro nombre de usuario: ");
-		_flushall();
-		gets(profesionales.Usuario);
-		longitudNombreUsuario = strlen(profesionales.Usuario);
-		i = 0;
 		
-		while(profesionales.Usuario[i] != '\0')
-		{
-		if(isupper(profesionales.Usuario[i]))
-		{
-			CantidadMayusculasNombreUsuario++;
-		}
-		i++;
-		}
-	}
-		
-	while(profesionales.Usuario[j] != '\0')
-	{
-		if(isdigit(profesionales.Usuario[j]))
-		{
-			CantidadDigitosNombreUsuario++;
-		}
-	j++;
-	}
-	
-	while(CantidadDigitosNombreUsuario > 3)
-	{
-		printf("\nEl nombre de usuario debe tener como maximo 3 digitos");
-		printf("\nIngrese otro nombre de usuario: ");
-		_flushall();
-		gets(profesionales.Usuario);
-		longitudNombreUsuario = strlen(profesionales.Usuario);
-		j = 0;
-		
-		while(profesionales.Usuario[j] != '\0')
-		{
-			if(isdigit(profesionales.Usuario[j]))
-			{
-				CantidadDigitosNombreUsuario++;
-			}
-	j++;
-		}
-		
-	}
-	printf("\nNombre de usuario valido");
-	
-	
-	printf("\nIngrese la contrasena del usuario: ");
-	_flushall();
-	gets(profesionales.Contrasena);
-	longitudContrasena = strlen(profesionales.Contrasena);
-	strcpy(cadenaMinuscula, profesionales.Contrasena);
-	strlwr(cadenaMinuscula);
-	
-	while(cadenaMinuscula[k] != '\0')
-	{
-		if(cadenaMinuscula[k] == 97 && cadenaMinuscula[k+1] == 98) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		else
-		{
-			break;
-		}
-		if(cadenaMinuscula[k] == 98 && cadenaMinuscula[k+1] == 99) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 99 && cadenaMinuscula[k+1] == 100) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 100 && cadenaMinuscula[k+1] == 101) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 101 && cadenaMinuscula[k+1] == 102) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 102 && cadenaMinuscula[k+1] == 103) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 103 && cadenaMinuscula[k+1] == 104) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 104 && cadenaMinuscula[k+1] == 105) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 105 && cadenaMinuscula[k+1] == 106) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 106 && cadenaMinuscula[k+1] == 107) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 107 && cadenaMinuscula[k+1] == 108) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 108 && cadenaMinuscula[k+1] == 109) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 109 && cadenaMinuscula[k+1] == 110) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 110 && cadenaMinuscula[k+1] == 111) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 111 && cadenaMinuscula[k+1] == 112) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 112 && cadenaMinuscula[k+1] == 113) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 113 && cadenaMinuscula[k+1] == 114) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 114 && cadenaMinuscula[k+1] == 115) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 115 && cadenaMinuscula[k+1] == 116) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 116 && cadenaMinuscula[k+1] == 117) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 117 && cadenaMinuscula[k+1] == 118) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 118 && cadenaMinuscula[k+1] == 119) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 119 && cadenaMinuscula[k+1] == 120) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 120 && cadenaMinuscula[k+1] == 121) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-		if(cadenaMinuscula[k] == 121 && cadenaMinuscula[k+1] == 122) 
-		{
-			printf("La contrasena no puede tener dos letras consecutivas ascendentemente");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			strcpy(cadenaMinuscula, profesionales.Contrasena);
-			strlwr(cadenaMinuscula);
-			longitudContrasena = strlen(profesionales.Contrasena);
-		}
-	}
-	
-	while(profesionales.Contrasena[l] != '\0')
-	{
-		while(isdigit(profesionales.Contrasena[l]) && isdigit(profesionales.Contrasena[l+1]) && isdigit(profesionales.Contrasena[l+2] && isdigit(profesionales.Contrasena[l+3])))
-		{
-			printf("\nLa contrasena no puede contener mas de 3 digitos consecutivos");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			longitudContrasena = strlen(profesionales.Contrasena);
-			l = 0;
-		}
-		l++;	
-	}
-	
-	while((longitudContrasena < 6) || (longitudContrasena > 32))
-	{
-		printf("\nLa contrasena debe contener entre 6 y 32 caracteres");
-		printf("\nIngrese otra contrasena: ");
+		printf("Nombre de Usuario erroneo\n");
+		printf("Un nombre de Usuario requiere lo siguiente: ");
+		printf("\n\nDebe ser unico para cada profesional registrado");
+		printf("\nDebe comenzar con una letra minuscula");
+		printf("\nDebe contener al menos 2 letras mayusculas");
+		printf("\nDebe contener como maximo 3 digitos");
+		printf("\n\nIngrese un nuevo nombre de usuario: ");
 		_flushall();
 		gets(profesionales.Contrasena);
-		longitudContrasena = strlen(profesionales.Contrasena);
-
-	}
-	
-	while(profesionales.Contrasena[p] != '\0')
-	{
-		while(!isalnum(profesionales.Contrasena[p]))
-		{
-			printf("\nLa contrasena no puede contener digitos no alfa-numericos");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			longitudContrasena = strlen(profesionales.Contrasena);
-			p++;
-		}
-	}
-	
-	while(profesionales.Contrasena[u] != '\0')
-	{
-		if(!isupper(profesionales.Contrasena[u]))
-		{
-			printf("\nLa contrasena debe contener al menos una mayuscula");
-			printf("\nIngrese otra contrasena: ");
-			_flushall();
-			gets(profesionales.Contrasena);
-			longitudContrasena = strlen(profesionales.Contrasena);
-			u++;
-		}
+		
 		
 	}
 	
 	
-	fseek(Profesionales,0,SEEK_END);
-	fwrite(&profesionales, sizeof(profesionales),1,Profesionales);
 	
+	printf("Nombre de Usuario valido...\n");
 	
-	fclose(Profesionales);
+	system("pause");
+	system("cls");
+	
+	printf("Ingrese la contrasena del Usuario: ");
+	_flushall();
+	gets(profesionales.Contrasena);
+
+	while(!VerificarContrasenia(profesionales))
+	{
+		printf("\nContrasena erronea\n");
+		printf("Una contrasena valida requiere lo siguiente: ");
+		printf("\n\nDebe contener al menos una letra mayuscula, una minuscula y un digito (0 a 9)");
+		printf("\nNo debe contener signos especiales, solo caracteres alfanumericos");
+		printf("\nDebe contener entre 6 y 32 caracteres");
+		printf("\nNo debe contener 3 numeros consecutivos");
+		printf("\nNo debe contener 2 letras consecutivas alfabeticamente");
+		printf("\n\nIngrese una nueva contrasena: ");
+		_flushall();
+		gets(profesionales.Contrasena);
+	}
+	
+	printf("Contrasena valida...\n");
+	
+	system("pause");
+	system("cls");
+	
+	fseek(archi, 0, SEEK_END);
+	fwrite(&profesionales, sizeof(profesionales), 1, archi);
+	
+	printf("Nuevo Profesional agregado exitosamente..");
+	
+	fclose(archi);
 }
 
-main()
+main()										//Función Main
 {
 	int opc = 0;
 	FILE *Profesionales;
@@ -517,3 +170,195 @@ main()
 		system("pause");
 	} while (opc != 5);
 }
+
+
+
+																//Desarrollo de Funciones usadas
+bool VerificarContrasenia(Usuarios regi)
+{
+	bool resultado = false;
+	int longitudContra = strlen(regi.Contrasena);
+	
+	resultado = ContraseniaMayusculaMinusculaNumero(regi) && ContraseniaSignosEspeciales(regi) && TresNumerosConsecutivos(regi) && DosLetrasConsecutivas(regi) && ((longitudContra >= 6) && (longitudContra <= 32));
+
+	return resultado;	
+}
+
+bool ContraseniaMayusculaMinusculaNumero(Usuarios regi)
+{
+	int longitudContra = strlen(regi.Contrasena);
+	int i;
+	bool MayusculaPresente = false;
+	bool MinusculaPresente = false;
+	bool DigitoPresente = false;
+	
+	for(i=0; i<longitudContra; i++)
+	{
+		if(isupper(regi.Contrasena[i]))
+		{
+			MayusculaPresente = true;
+		}
+		
+		if(islower(regi.Contrasena[i]))
+		{
+			MinusculaPresente = true;	
+		}
+		
+		if(isdigit(regi.Contrasena[i]))
+		{
+			DigitoPresente = true;
+		}
+	}
+	if(MayusculaPresente && MinusculaPresente && DigitoPresente)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool ContraseniaSignosEspeciales(Usuarios regi)
+{
+	int longitudContra = strlen(regi.Contrasena);
+	int i;
+	
+	for(i=0; i<longitudContra; i++)
+	{
+		if(!isalnum(regi.Contrasena[i]))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool TresNumerosConsecutivos(Usuarios regi)
+{
+	int longitudContra = strlen(regi.Contrasena);
+	int i;
+	
+	for(i=0; i<longitudContra; i++)
+	{
+		if(isdigit(regi.Contrasena[i]) && isdigit(regi.Contrasena[i+1]) && isdigit(regi.Contrasena[i+2]))
+		return false;
+	}
+	return true;
+}
+
+bool DosLetrasConsecutivas(Usuarios regi)
+{
+	int longitudContra = strlen(regi.Contrasena);
+	char ContraMinuscula[32];
+	strcpy(ContraMinuscula, regi.Contrasena);
+	strlwr(ContraMinuscula);
+	int i;
+	
+	for(i=0; i<longitudContra; i++)
+	{
+		if(ContraMinuscula[i] - ContraMinuscula[i-1] != 1)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool VerificarNombreDeUsuario(Usuarios regi)
+{
+	bool resultado = false;
+	int longitudNombre = strlen(regi.ApellidoYNombre);
+	
+	resultado = ComienzaMinuscula(regi) && ContieneDosMayusculas(regi) && ContieneMaximoTresDigitos(regi) && ((longitudNombre >=6) && (longitudNombre <= 10));
+	
+	return resultado;
+}
+
+bool ComienzaMinuscula(Usuarios regi)
+{
+	if(islower(regi.ApellidoYNombre[0]))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool ContieneDosMayusculas(Usuarios regi)
+{
+	int longitudNombre = strlen(regi.ApellidoYNombre);
+	int i;
+	int CantidadMayusculas = 0;
+	
+	for(i=0; i<longitudNombre; i++)
+	{
+		if(isupper(regi.ApellidoYNombre[i]))
+		{
+			CantidadMayusculas++;
+		}
+	}
+	if(CantidadMayusculas >= 2)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool ContieneMaximoTresDigitos(Usuarios regi)
+{
+	int longitudNombre = strlen(regi.ApellidoYNombre);
+	int i;
+	int CantidadDigitos = 0;
+	
+	for(i=0; i<longitudNombre; i++)
+	{
+		if(isdigit(regi.ApellidoYNombre[i]))
+		{
+			CantidadDigitos++;
+		}
+	}
+	
+	if(CantidadDigitos <= 3)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+/*
+bool EsUnico(FILE *archi)
+{
+	Usuarios regi;
+	char NombreUsuarioActual[32];
+	strcpy(NombreUsuarioActual, "");
+	strcpy(NombreUsuarioActual, regi.ApellidoYNombre);
+	int Comparacion;
+	Comparacion = strcmp(NombreUsuarioActual, regi.ApellidoYNombre);
+	bool NombreUnico;
+	
+	rewind(archi);
+	
+	fread(&regi, sizeof(regi), 1, archi);
+	
+	while(!feof(archi))
+	{
+		if(Comparacion == 0)
+		{
+			NombreUnico = false;
+			
+		}
+		else
+		{
+			NombreUnico = true;
+		}
+		fread(&regi, sizeof(regi), 1, archi);
+	}
+	return NombreUnico;
+}
+*/
+//Este código fue realizado por Casanueva Facundo Gabriel; comisión 1K2
