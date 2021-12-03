@@ -34,7 +34,7 @@ bool VerificarNombreDeUsuario(Usuarios regi);
 bool ComienzaMinuscula(Usuarios regi);
 bool ContieneDosMayusculas(Usuarios regi);
 bool ContieneMaximoTresDigitos(Usuarios regi);
-
+int SalirseALaMierda(FILE *archi, Usuarios regi, char UsuarioActual[10]);
 															//Seccion de prototipos de funciones para la creacion del nuevo usuario
 bool VerificarContrasenia(Usuarios regi);						
 bool ContraseniaMayusculaMinusculaNumero(Usuarios regi);
@@ -45,40 +45,33 @@ bool DosLetrasConsecutivas(Usuarios regi);
 void RegistrarProfesional(FILE *archi)		//Registrar Profesionales en el archivo
 {
 	Usuarios profesionales;
-	
-	
-	
-	archi = fopen("Profesionales.dat", "r+b");
-	
-	if (archi == NULL)
-	{
-		archi = fopen("Profesionales.dat", "w+b");
+	int Comparacion;
 		
-		if (archi == NULL)
-		{
-			printf("Error. No se pudo crear el archivo");
-			exit(1);
-		}
-	}
-	
 	printf("Ingrese el nombre de Usuario del nuevo Profesional: ");
 	_flushall();
-	gets(profesionales.ApellidoYNombre);
+	gets(profesionales.Usuario);
+	char NombreUsuarioActual[10];
+	strcpy(NombreUsuarioActual, "");
+	strcpy(NombreUsuarioActual, profesionales.Usuario);
+	Comparacion = SalirseALaMierda(archi, profesionales, NombreUsuarioActual);
 	
-	while(!VerificarNombreDeUsuario(profesionales))
+
+	while(!VerificarNombreDeUsuario(profesionales) or (Comparacion!=0))
 	{
+			printf("Nombre de Usuario erroneo\n");
+			printf("Un nombre de Usuario requiere lo siguiente: ");
+			printf("\n\nDebe ser unico para cada profesional registrado");
+			printf("\nDebe comenzar con una letra minuscula");
+			printf("\nDebe contener al menos 2 letras mayusculas");
+			printf("\nDebe contener como maximo 3 digitos");
+			printf("\n\nIngrese un nuevo nombre de usuario: ");
+			_flushall();
+			gets(profesionales.Usuario);
+			strcpy(NombreUsuarioActual, "");
+			strcpy(NombreUsuarioActual, profesionales.Usuario);
+			Comparacion = SalirseALaMierda(archi, profesionales, NombreUsuarioActual);
 		
-		printf("Nombre de Usuario erroneo\n");
-		printf("Un nombre de Usuario requiere lo siguiente: ");
-		printf("\n\nDebe ser unico para cada profesional registrado");
-		printf("\nDebe comenzar con una letra minuscula");
-		printf("\nDebe contener al menos 2 letras mayusculas");
-		printf("\nDebe contener como maximo 3 digitos");
-		printf("\n\nIngrese un nuevo nombre de usuario: ");
-		_flushall();
-		gets(profesionales.Contrasena);
-		
-		
+			
 	}
 	
 	
@@ -111,12 +104,17 @@ void RegistrarProfesional(FILE *archi)		//Registrar Profesionales en el archivo
 	system("pause");
 	system("cls");
 	
+	printf("Ingrese Nombre y Apellido del profesional: ");
+	_flushall();
+	gets(profesionales.ApellidoYNombre);
+	
+	
 	fseek(archi, 0, SEEK_END);
 	fwrite(&profesionales, sizeof(profesionales), 1, archi);
 	
 	printf("Nuevo Profesional agregado exitosamente..");
 	
-	fclose(archi);
+	
 }
 
 main()										//Función Main
@@ -124,6 +122,19 @@ main()										//Función Main
 	int opc = 0;
 	FILE *Profesionales;
 	FILE *Recepcionistas;
+	
+	Profesionales = fopen("Profesionales.dat", "r+b");
+	
+	if (Profesionales == NULL)
+	{
+		Profesionales = fopen("Profesionales.dat", "w+b");
+		
+		if (Profesionales == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
 	
 	do 
 	{
@@ -158,7 +169,13 @@ main()										//Función Main
 						printf("Saliendo de la Aplicacion");
 						break;
 					}
-
+		/*			
+			case 8: {
+						printf("Listar\n\n");
+						
+						break;
+					}
+*/
 			default: {
 						printf("Error. Opcion incorrecta...");
 						break;
@@ -169,6 +186,9 @@ main()										//Función Main
 		printf("\n\n");
 		system("pause");
 	} while (opc != 5);
+	
+	fclose(Profesionales);
+	
 }
 
 
@@ -268,7 +288,7 @@ bool DosLetrasConsecutivas(Usuarios regi)
 bool VerificarNombreDeUsuario(Usuarios regi)
 {
 	bool resultado = false;
-	int longitudNombre = strlen(regi.ApellidoYNombre);
+	int longitudNombre = strlen(regi.Usuario);
 	
 	resultado = ComienzaMinuscula(regi) && ContieneDosMayusculas(regi) && ContieneMaximoTresDigitos(regi) && ((longitudNombre >=6) && (longitudNombre <= 10));
 	
@@ -277,7 +297,7 @@ bool VerificarNombreDeUsuario(Usuarios regi)
 
 bool ComienzaMinuscula(Usuarios regi)
 {
-	if(islower(regi.ApellidoYNombre[0]))
+	if(islower(regi.Usuario[0]))
 	{
 		return true;
 	}
@@ -286,13 +306,13 @@ bool ComienzaMinuscula(Usuarios regi)
 
 bool ContieneDosMayusculas(Usuarios regi)
 {
-	int longitudNombre = strlen(regi.ApellidoYNombre);
+	int longitudNombre = strlen(regi.Usuario);
 	int i;
 	int CantidadMayusculas = 0;
 	
 	for(i=0; i<longitudNombre; i++)
 	{
-		if(isupper(regi.ApellidoYNombre[i]))
+		if(isupper(regi.Usuario[i]))
 		{
 			CantidadMayusculas++;
 		}
@@ -309,13 +329,13 @@ bool ContieneDosMayusculas(Usuarios regi)
 
 bool ContieneMaximoTresDigitos(Usuarios regi)
 {
-	int longitudNombre = strlen(regi.ApellidoYNombre);
+	int longitudNombre = strlen(regi.Usuario);
 	int i;
 	int CantidadDigitos = 0;
 	
 	for(i=0; i<longitudNombre; i++)
 	{
-		if(isdigit(regi.ApellidoYNombre[i]))
+		if(isdigit(regi.Usuario[i]))
 		{
 			CantidadDigitos++;
 		}
@@ -330,35 +350,30 @@ bool ContieneMaximoTresDigitos(Usuarios regi)
 		return false;
 	}
 }
-/*
-bool EsUnico(FILE *archi)
+
+int SalirseALaMierda(FILE* archi, Usuarios regi, char UsuarioActual[10])
 {
-	Usuarios regi;
-	char NombreUsuarioActual[32];
-	strcpy(NombreUsuarioActual, "");
-	strcpy(NombreUsuarioActual, regi.ApellidoYNombre);
-	int Comparacion;
-	Comparacion = strcmp(NombreUsuarioActual, regi.ApellidoYNombre);
-	bool NombreUnico;
+	int comparacion;
+	int Numero = 0;
 	
 	rewind(archi);
 	
 	fread(&regi, sizeof(regi), 1, archi);
 	
-	while(!feof(archi))
+	while( !feof(archi) )
 	{
-		if(Comparacion == 0)
+		comparacion = strcmp(regi.Usuario, UsuarioActual);
+		
+		if (comparacion == 0)
 		{
-			NombreUnico = false;
-			
-		}
-		else
-		{
-			NombreUnico = true;
+			Numero++;
+			printf("chupame la re pija");
+			printf("\n%s", regi.Usuario);
+			printf("\n%s\n", UsuarioActual);
 		}
 		fread(&regi, sizeof(regi), 1, archi);
 	}
-	return NombreUnico;
+	return Numero;
 }
-*/
+
 //Este código fue realizado por Casanueva Facundo Gabriel; comisión 1K2

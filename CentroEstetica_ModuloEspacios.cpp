@@ -3,10 +3,12 @@
 #include <conio.h>
 #include <string.h>
 
+typedef char cadena[80];
+
 struct Usuarios
 {
 	char Usuario[10];
-	char Contrasena[10];
+	char Contrasena[32];
 	char ApellidoYNombre[60];
 };
 
@@ -29,16 +31,30 @@ int Menu()
 	return opcion;
 }
 
-void InicioDeSesion(FILE *Profesionales)
+void LeerNombreUsuario(FILE *archi, cadena Usuario, Usuarios regi);
+
+
+void InicioDeSesion(FILE *archi)
 {
-	Usuarios usuarios;
+	Usuarios regi;
+	
+	cadena NombreUsuario;
+	cadena Contrasena;
+		
 	printf("Ingrese su nombre de usuario: ");
 	_flushall();
-	gets(usuarios.Usuario);
+	gets(NombreUsuario);
+	
+	LeerNombreUsuario(archi, NombreUsuario, regi);
 	
 	printf("Ingrese su contrasena: ");
 	_flushall();
-	gets(usuarios.Contrasena);
+	gets(Contrasena);
+	
+	
+	
+	
+	
 }
 
 
@@ -104,9 +120,27 @@ main()
 		system("pause");
 	} while (opc != 4);
 	
-	
-	
-	
-	
-	
 }
+
+
+void LeerNombreUsuario(FILE *archi, cadena Usuario, Usuarios regi)
+{
+	rewind(archi);
+	
+	fread(&regi, sizeof(regi), 1, archi);
+	
+	while ( !feof(archi) )
+	{
+		while(Usuario != regi.Usuario)
+		{
+			printf("\nNo existe un profesional con ese nombre de usuario");
+			printf("\nIngrese otro nombre de usuario: ");
+			_flushall();
+			gets(Usuario);
+			
+		}
+		fread(&regi, sizeof(regi), 1, archi);
+	}
+
+}
+
