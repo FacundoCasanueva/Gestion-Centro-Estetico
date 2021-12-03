@@ -84,9 +84,9 @@ void RegistrarProfesional(FILE *archiprof, FILE *archirecep)		//Registrar Profes
 	char NombreUsuarioProfesionalActual[10];
 	strcpy(NombreUsuarioProfesionalActual, "");
 	strcpy(NombreUsuarioProfesionalActual, profesionales.Usuario);
-	ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, profesionales, NombreUsuarioProfesionalActual);
-	ComparacionRecep = ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(archirecep, profesionales, NombreUsuarioProfesionalActual);
-
+	ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, profesionales, NombreUsuarioProfesionalActual);     //Estas dos funciones comparan el nombre
+	ComparacionRecep = ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(archirecep, profesionales, NombreUsuarioProfesionalActual);  //de usuario actual con otro nombre de usuraio
+																																		 //en cualquiera de los dos archivos
 	while(!VerificarNombreDeUsuario(profesionales) or (ComparacionProf!=0) or (ComparacionRecep!=0))
 	{
 			printf("Nombre de Usuario erroneo\n");
@@ -158,7 +158,7 @@ void RegistrarRecepcionista(FILE *archirecep, FILE *archiprof)   //Registrar Rec
 	
 	if (archirecep == NULL)
 	{
-		archirecep = fopen("Recepcionistas.dat", "w+b");
+		archirecep = fopen("Recepcionistas.dat", "w+b");		//Apertura del archivo recepcionistas.dat
 		
 		if (archirecep == NULL)
 		{
@@ -188,9 +188,9 @@ void RegistrarRecepcionista(FILE *archirecep, FILE *archiprof)   //Registrar Rec
 	char NombreUsuarioRecepcionistaActual[10];
 	strcpy(NombreUsuarioRecepcionistaActual, "");
 	strcpy(NombreUsuarioRecepcionistaActual, recepcionistas.Usuario);
-	ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, recepcionistas, NombreUsuarioRecepcionistaActual);
-	ComparacionRecep = ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(archirecep, recepcionistas, NombreUsuarioRecepcionistaActual);
-	
+	ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, recepcionistas, NombreUsuarioRecepcionistaActual);		//Estas dos funciones comparan el
+	ComparacionRecep = ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(archirecep, recepcionistas, NombreUsuarioRecepcionistaActual);  //Nombre de usuario actual con los
+																															                //existentes en los archivos
 	while(!VerificarNombreDeUsuario(recepcionistas) or (ComparacionProf!=0) or (ComparacionRecep !=0))
 	{
 			printf("Nombre de Usuario erroneo\n");
@@ -252,6 +252,12 @@ void RegistrarRecepcionista(FILE *archirecep, FILE *archiprof)   //Registrar Rec
 	fclose(archiprof);
 	
 }
+
+
+
+
+
+
 
 main()										//Función Main
 {
