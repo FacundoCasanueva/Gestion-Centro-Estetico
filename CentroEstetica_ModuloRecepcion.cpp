@@ -16,7 +16,7 @@ struct Cliente
 	char ApellidoYNombre[60];
 	char Domicilio[60];
 	int DNIcliente;
-	char Localidad;
+	char Localidad[60];
 	Fecha FechaDeNacimiento;
 	float Peso;
 	char Telefono[25];
@@ -56,9 +56,9 @@ int Menu()					//Funcion del menú
 }
 
 int ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(FILE *archirecep, Usuarios regi, char UsuarioActual[10], char ContrasenaTarget[32], char NombreYApellido[60]);
+																																											//PROTOTIPO DE FUNCIONES
 
-
-void IniciarSesionRecepcionista(FILE *archirecep)
+void IniciarSesionRecepcionista(FILE *archirecep) //Inicio de sesion
 {
 	Usuarios recepcionistas;
 	char NombreUsuario[10];
@@ -121,12 +121,68 @@ void IniciarSesionRecepcionista(FILE *archirecep)
 	printf("Bienvenido al sistema %s", ApellidoYNombre);	
 }
 
+void RegistrarClientes(FILE *archiclient)//Registro De Clientes
+{
+	Cliente clientes;
+	
+	archiclient = fopen("Clientes.dat", "r+b");
+	
+	if (archiclient == NULL)
+	{
+		archiclient = fopen("Clientes.dat", "w+b");		//Apertura del archivo recepcionistas.dat
+		
+		if (archiclient == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
+	
+	printf("\nIngrese el Nombre y Apellido del cliente: ");
+	_flushall();
+	gets(clientes.ApellidoYNombre);
+	
+	printf("\nIngrese el Domicilio del Cliente: ");
+	_flushall();
+	gets(clientes.Domicilio);
+	
+	printf("\nIngrese el DNI del cliente (sin puntos): ");
+	scanf("%d", &clientes.DNIcliente);
+	
+	printf("\nIngrese la localidad de residencia del Cliente: ");
+	_flushall();
+	gets(clientes.Localidad);
+	
+	printf("\nIngrese la fecha de naciemiento del cliente: ");
+	printf("\ndd: ");
+	scanf("%d", &clientes.FechaDeNacimiento.dd);
+	printf("mm: ");
+	scanf("%d", &clientes.FechaDeNacimiento.mm);
+	printf("aaaa: ");
+	scanf("%d", &clientes.FechaDeNacimiento.aaaa);
+	
+	printf("\nIngrese el peso del cliente: ");
+	scanf("%f", &clientes.Peso);
+	
+	printf("\nIngrese el telefono del cliente: ");
+	_flushall();
+	gets(clientes.Telefono);
+	
+	fseek(archiclient, 0, SEEK_END);
+	fwrite(&clientes, sizeof(clientes), 1, archiclient);
+	
+	fclose(archiclient);
+}
+
+
+
+
 
 main()
 {
 	int opc = 0;
 	FILE *Recepcionistas;
-	
+	FILE *Clientes;
 	
 	
 	do 
@@ -145,12 +201,13 @@ main()
 		
 			case 2: {
 						printf("Registrar Cliente\n\n");
-					
+						RegistrarClientes(Clientes);
 						break;
 					}
 
 			case 3: {
 						printf("Registrar Turno\n\n");
+						
 						break;
 					}
 
