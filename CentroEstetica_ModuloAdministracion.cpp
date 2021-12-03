@@ -34,7 +34,7 @@ bool VerificarNombreDeUsuario(Usuarios regi);
 bool ComienzaMinuscula(Usuarios regi);
 bool ContieneDosMayusculas(Usuarios regi);
 bool ContieneMaximoTresDigitos(Usuarios regi);
-int SalirseALaMierda(FILE *archi, Usuarios regi, char UsuarioActual[10]);
+int ComprobarNombreDeUsuarioUnico(FILE *archi, Usuarios regi, char UsuarioActual[10]);
 															//Seccion de prototipos de funciones para la creacion del nuevo usuario
 bool VerificarContrasenia(Usuarios regi);						
 bool ContraseniaMayusculaMinusculaNumero(Usuarios regi);
@@ -46,6 +46,20 @@ void RegistrarProfesional(FILE *archi)		//Registrar Profesionales en el archivo
 {
 	Usuarios profesionales;
 	int Comparacion;
+	
+	archi = fopen("Profesionales.dat", "r+b");
+	
+	if (archi == NULL)
+	{
+		archi = fopen("Profesionales.dat", "w+b");
+		
+		if (archi == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
+	
 		
 	printf("Ingrese el nombre de Usuario del nuevo Profesional: ");
 	_flushall();
@@ -53,7 +67,7 @@ void RegistrarProfesional(FILE *archi)		//Registrar Profesionales en el archivo
 	char NombreUsuarioActual[10];
 	strcpy(NombreUsuarioActual, "");
 	strcpy(NombreUsuarioActual, profesionales.Usuario);
-	Comparacion = SalirseALaMierda(archi, profesionales, NombreUsuarioActual);
+	Comparacion = ComprobarNombreDeUsuarioUnico(archi, profesionales, NombreUsuarioActual);
 	
 
 	while(!VerificarNombreDeUsuario(profesionales) or (Comparacion!=0))
@@ -69,7 +83,7 @@ void RegistrarProfesional(FILE *archi)		//Registrar Profesionales en el archivo
 			gets(profesionales.Usuario);
 			strcpy(NombreUsuarioActual, "");
 			strcpy(NombreUsuarioActual, profesionales.Usuario);
-			Comparacion = SalirseALaMierda(archi, profesionales, NombreUsuarioActual);
+			Comparacion = ComprobarNombreDeUsuarioUnico(archi, profesionales, NombreUsuarioActual);
 		
 			
 	}
@@ -114,7 +128,7 @@ void RegistrarProfesional(FILE *archi)		//Registrar Profesionales en el archivo
 	
 	printf("Nuevo Profesional agregado exitosamente..");
 	
-	
+	fclose(archi);
 }
 
 main()										//Función Main
@@ -123,18 +137,7 @@ main()										//Función Main
 	FILE *Profesionales;
 	FILE *Recepcionistas;
 	
-	Profesionales = fopen("Profesionales.dat", "r+b");
 	
-	if (Profesionales == NULL)
-	{
-		Profesionales = fopen("Profesionales.dat", "w+b");
-		
-		if (Profesionales == NULL)
-		{
-			printf("Error. No se pudo crear el archivo");
-			exit(1);
-		}
-	}
 	
 	do 
 	{
@@ -187,7 +190,7 @@ main()										//Función Main
 		system("pause");
 	} while (opc != 5);
 	
-	fclose(Profesionales);
+	
 	
 }
 
@@ -351,7 +354,7 @@ bool ContieneMaximoTresDigitos(Usuarios regi)
 	}
 }
 
-int SalirseALaMierda(FILE* archi, Usuarios regi, char UsuarioActual[10])
+int ComprobarNombreDeUsuarioUnico(FILE* archi, Usuarios regi, char UsuarioActual[10])
 {
 	int comparacion;
 	int Numero = 0;
@@ -367,9 +370,7 @@ int SalirseALaMierda(FILE* archi, Usuarios regi, char UsuarioActual[10])
 		if (comparacion == 0)
 		{
 			Numero++;
-			printf("chupame la re pija");
-			printf("\n%s", regi.Usuario);
-			printf("\n%s\n", UsuarioActual);
+			
 		}
 		fread(&regi, sizeof(regi), 1, archi);
 	}
