@@ -40,8 +40,8 @@ struct Usuarios
 struct Profesionales
 {
 	char ApellidoyNombre[60];
-	int IDProfesional;
 	int DNIProfesional;
+	int IDProfesional;
 	char Telefono[25];
 };
 
@@ -64,7 +64,7 @@ int Menu()					//Funcion del menú
 }
 
 int ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(FILE *archirecep, Usuarios regi, char UsuarioActual[10], char ContrasenaTarget[32], char NombreYApellido[60]);
-																																											//PROTOTIPO DE FUNCIONES
+int ComprobarIDProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, int IDActual, char NombredelProfesional[60]);																	//PROTOTIPO DE FUNCIONES
 
 void IniciarSesionRecepcionista(FILE *archirecep) //Inicio de sesion
 {
@@ -179,12 +179,19 @@ void RegistrarClientes(FILE *archiclient)//Registro De Clientes
 	fseek(archiclient, 0, SEEK_END);
 	fwrite(&clientes, sizeof(clientes), 1, archiclient);
 	
+	printf("\nCliente agregado con exito");
+	
 	fclose(archiclient);
 }
 
-void RegistrarTurnos(FILE *architurnos)
+void RegistrarTurnos(FILE *architurnos, FILE *archiprof)
 {
+	Usuarios usuarios;
 	Turnos turnos;
+	Profesionales pros;
+	int Comparacion;
+	int IDProActual;
+	char NombreProfesional[60];
 	
 	architurnos = fopen("Turnos.dat", "r+b");
 	
@@ -199,10 +206,52 @@ void RegistrarTurnos(FILE *architurnos)
 		}
 	}
 	
+	archiprof = fopen("Profesionales.dat", "r+b");
+	
+	if (archiprof == NULL)
+	{
+		archiprof = fopen("Profesionales.dat", "w+b");				//Abrir archivo Profesionales.dat
+		
+		if (archiprof == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
 	
 	
 	
+	printf("Ingrese el DNI del Profesional que va a atender al cliente: ");
+	scanf("%d", &IDProActual);
+	Comparacion = ComprobarIDProfesional(archiprof, usuarios, pros, IDProActual, NombreProfesional);
 	
+	while(Comparacion == 0)
+	{
+		printf("\nNo existe un Profesional con ese DNI");
+		printf("\nIngrese el DNI del Profesional que va a atender al cliente: ");
+		scanf("%d", &IDProActual);
+		Comparacion = ComprobarIDProfesional(archiprof, usuarios, pros, IDProActual, NombreProfesional);
+	}
+	
+	turnos.IdProfesional = IDProActual;
+	
+	printf("\nEl Profesional que va a atender al cliente es: %s\n\n", NombreProfesional);
+	
+	system("pause");
+	system("cls");
+	
+	printf("\nIngrese la fecha del turno");
+	printf("\ndd: ");
+	scanf("%d", &turnos.Fechaactual.dd);
+	printf("mm: ");
+	scanf("%d", &turnos.Fechaactual.mm);
+	printf("aaaa: ");
+	scanf("%d", &turnos.Fechaactual.aaaa);
+	
+	
+	
+	fclose(architurnos);
+	fclose(archiprof);
 }
 
 
@@ -213,6 +262,7 @@ main()
 	FILE *Recepcionistas;
 	FILE *Clientes;
 	FILE *Turnos;
+	FILE *Profesionales;
 	
 	
 	do 
@@ -237,7 +287,7 @@ main()
 
 			case 3: {
 						printf("Registrar Turno\n\n");
-						RegistrarTurnos(Turnos);
+						RegistrarTurnos(Turnos, Profesionales);
 						break;
 					}
 
@@ -288,10 +338,30 @@ int ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(FILE* archi, Usuarios r
 	return Numero;
 }
 
-int ComprobarIDProfesional(FILE *archi, Usuarios usu, Profesionales pros, int IDActual)
+int ComprobarIDProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, int IDActual, char NombredelProfesional[60])
 {
+	int Numero = 0;
 	
+	rewind(archiprof);
+
+	fread(&regi, sizeof(regi), 1, archiprof);
+	fread(&pros, sizeof(pros), 1, archiprof);
+		
+	while( !feof(archiprof) )
+	{
+		if (IDActual == pros.IDProfesional)
+		{
+			Numero++;
+			strcpy(NombredelProfesional, pros.ApellidoyNombre);
+			
+		}
+		
+		fread(&regi, sizeof(regi), 1, archiprof);
+		fread(&pros, sizeof(pros), 1, archiprof);
+	}
+	return Numero;	
 }
+
 
 
 

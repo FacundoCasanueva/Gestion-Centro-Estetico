@@ -1,0 +1,23 @@
+1. Apellido Y Nombre: Martin Chavez
+   Domicilio: Estados Unidos 101
+   DNI Cliente: 40.789.456
+   Localidad: San Miguel de Tucuman
+   Fecha De Nacimiento: 17/08/1995
+   Peso: 80.75
+   Telefono: 3813031084
+
+2. Apellido Y Nombre: Leticia Chavez
+   Domicilio: San Juan 938
+   DNI Cliente: 23.917.945
+   Localidad: San Miguel de Tucuman
+   Fecha de Nacimiento: 25/06/1974
+   Peso: 55,50
+   Telefono: 3873440653
+ 
+3. Apellido y Nombre: Dario Casanueva
+   Domicilio: Catamarca 420
+   DNI Cliente: 16.167.321
+   Localidad: San Miguel de Tucuman
+   Fecha de Nacimiento: 05/02/1964
+   Peso: 70,84
+   Telefono: 3873623359
