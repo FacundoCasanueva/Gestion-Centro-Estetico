@@ -40,8 +40,8 @@ struct Usuarios
 struct Profesionales
 {
 	char ApellidoyNombre[60];
-	int DNIProfesional;
 	int IDProfesional;
+	int DNIProfesional;
 	char Telefono[25];
 };
 
@@ -64,7 +64,11 @@ int Menu()					//Funcion del menú
 }
 
 int ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(FILE *archirecep, Usuarios regi, char UsuarioActual[10], char ContrasenaTarget[32], char NombreYApellido[60]);
-int ComprobarIDProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, int IDActual, char NombredelProfesional[60]);																	//PROTOTIPO DE FUNCIONES
+int ComprobarIDProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, int IDActual, char NombredelProfesional[60]);						//PROTOTIPO DE FUNCIONES
+int ComprobarDNIClientes(FILE *archiclient, Cliente clientes, int DNIClienteActual, char NombreCliente[60]);
+
+
+
 
 void IniciarSesionRecepcionista(FILE *archirecep) //Inicio de sesion
 {
@@ -137,7 +141,7 @@ void RegistrarClientes(FILE *archiclient)//Registro De Clientes
 	
 	if (archiclient == NULL)
 	{
-		archiclient = fopen("Clientes.dat", "w+b");		//Apertura del archivo recepcionistas.dat
+		archiclient = fopen("Clientes.dat", "w+b");		//Apertura del archivo Clientes.dat
 		
 		if (archiclient == NULL)
 		{
@@ -161,7 +165,7 @@ void RegistrarClientes(FILE *archiclient)//Registro De Clientes
 	_flushall();
 	gets(clientes.Localidad);
 	
-	printf("\nIngrese la fecha de naciemiento del cliente: ");
+	printf("\nIngrese la fecha de nacimiento del cliente: ");
 	printf("\ndd: ");
 	scanf("%d", &clientes.FechaDeNacimiento.dd);
 	printf("mm: ");
@@ -184,14 +188,20 @@ void RegistrarClientes(FILE *archiclient)//Registro De Clientes
 	fclose(archiclient);
 }
 
-void RegistrarTurnos(FILE *architurnos, FILE *archiprof)
+void RegistrarTurnos(FILE *architurnos, FILE *archiprof, FILE *archiclient)
 {
 	Usuarios usuarios;
 	Turnos turnos;
 	Profesionales pros;
-	int Comparacion;
+	Cliente clientes;
+	
+	int ComparacionID;
 	int IDProActual;
 	char NombreProfesional[60];
+	
+	int ComparacionDNI;
+	int DNIActual;
+	char NombreApellidoCliente[60];
 	
 	architurnos = fopen("Turnos.dat", "r+b");
 	
@@ -220,17 +230,31 @@ void RegistrarTurnos(FILE *architurnos, FILE *archiprof)
 	}
 	
 	
+	archiclient = fopen("Clientes.dat", "r+b");
 	
-	printf("Ingrese el DNI del Profesional que va a atender al cliente: ");
-	scanf("%d", &IDProActual);
-	Comparacion = ComprobarIDProfesional(archiprof, usuarios, pros, IDProActual, NombreProfesional);
-	
-	while(Comparacion == 0)
+	if (archiclient == NULL)
 	{
-		printf("\nNo existe un Profesional con ese DNI");
-		printf("\nIngrese el DNI del Profesional que va a atender al cliente: ");
+		archiclient = fopen("Clientes.dat", "w+b");		//Apertura del archivo Clientes.dat
+		
+		if (archiclient == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
+	
+										//Alta de Turno
+	
+	printf("Ingrese el ID del Profesional que va a atender al cliente: ");
+	scanf("%d", &IDProActual);
+	ComparacionID = ComprobarIDProfesional(archiprof, usuarios, pros, IDProActual, NombreProfesional);
+	
+	while(ComparacionID == 0)
+	{
+		printf("\nNo existe un Profesional con ese ID");
+		printf("\nIngrese el ID del Profesional que va a atender al cliente: ");
 		scanf("%d", &IDProActual);
-		Comparacion = ComprobarIDProfesional(archiprof, usuarios, pros, IDProActual, NombreProfesional);
+		ComparacionID = ComprobarIDProfesional(archiprof, usuarios, pros, IDProActual, NombreProfesional);
 	}
 	
 	turnos.IdProfesional = IDProActual;
@@ -248,10 +272,34 @@ void RegistrarTurnos(FILE *architurnos, FILE *archiprof)
 	printf("aaaa: ");
 	scanf("%d", &turnos.Fechaactual.aaaa);
 	
+	system("pause");
+	system("cls");
 	
+	printf("Ingrese el DNI del cliente: ");
+	scanf("%d", &DNIActual);
+	ComparacionDNI = ComprobarDNIClientes(archiclient, clientes, DNIActual, NombreApellidoCliente);
+	
+	while(ComparacionDNI == 0)
+	{
+		printf("\nNo existe un Cliente con ese DNI");
+		printf("\nIngrese el DNI del cliente: ");
+		scanf("%d", &DNIActual);
+		ComparacionDNI = ComprobarDNIClientes(archiclient, clientes, DNIActual, NombreApellidoCliente);
+	}
+	
+	turnos.DNIcliente = DNIActual;
+	printf("\nEl cliente solicitando el turno es: %s", NombreApellidoCliente);
+	
+	strcpy(turnos.DetalleDeAtencion, "");
+	
+	fseek(architurnos, 0, SEEK_END);
+	fwrite(&turnos, sizeof(turnos), 1, architurnos);
+	
+	printf("\n\nTurno agregado exitosamente");
 	
 	fclose(architurnos);
 	fclose(archiprof);
+	fclose(archiclient);
 }
 
 
@@ -287,7 +335,7 @@ main()
 
 			case 3: {
 						printf("Registrar Turno\n\n");
-						RegistrarTurnos(Turnos, Profesionales);
+						RegistrarTurnos(Turnos, Profesionales, Clientes);
 						break;
 					}
 
@@ -362,7 +410,28 @@ int ComprobarIDProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, i
 	return Numero;	
 }
 
-
+int ComprobarDNIClientes(FILE *archiclient, Cliente clientes, int DNIClienteActual, char NombreCliente[60])
+{
+	int Numero = 0;
+	
+	rewind(archiclient);
+	
+	fread(&clientes, sizeof(clientes), 1, archiclient);
+	
+	while( !feof(archiclient) )
+	{
+		if(DNIClienteActual == clientes.DNIcliente)
+		{
+			Numero++;
+			strcpy(NombreCliente, clientes.ApellidoYNombre);
+		}
+		
+		fread(&clientes, sizeof(clientes), 1, archiclient);
+	}
+	
+	
+	return Numero;
+}
 
 
 
