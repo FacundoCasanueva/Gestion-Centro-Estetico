@@ -37,6 +37,14 @@ struct Usuarios
 	char ApellidoYNombre[60];
 };
 
+struct Profesionales
+{
+	char ApellidoyNombre[60];
+	int IDProfesional;
+	int DNIProfesional;
+	char Telefono[25];
+};
+
 int Menu()					//Funcion del menú
 {
 	int opcion = 0;
@@ -174,7 +182,28 @@ void RegistrarClientes(FILE *archiclient)//Registro De Clientes
 	fclose(archiclient);
 }
 
-
+void RegistrarTurnos(FILE *architurnos)
+{
+	Turnos turnos;
+	
+	architurnos = fopen("Turnos.dat", "r+b");
+	
+	if (architurnos == NULL)
+	{
+		architurnos = fopen("Turnos.dat", "w+b");		//Apertura del archivo recepcionistas.dat
+		
+		if (architurnos == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
+	
+	
+	
+	
+	
+}
 
 
 
@@ -183,6 +212,7 @@ main()
 	int opc = 0;
 	FILE *Recepcionistas;
 	FILE *Clientes;
+	FILE *Turnos;
 	
 	
 	do 
@@ -207,7 +237,7 @@ main()
 
 			case 3: {
 						printf("Registrar Turno\n\n");
-						
+						RegistrarTurnos(Turnos);
 						break;
 					}
 
@@ -257,4 +287,17 @@ int ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(FILE* archi, Usuarios r
 	}
 	return Numero;
 }
+
+int ComprobarIDProfesional(FILE *archi, Usuarios usu, Profesionales pros, int IDActual)
+{
+	
+}
+
+
+
+
+
+
+
+
 

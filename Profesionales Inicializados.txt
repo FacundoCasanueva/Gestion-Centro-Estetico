@@ -1,0 +1,20 @@
+1. Nombre y Apellido: Martin Martearena
+   Nombre Usuario: mARtin12
+   Contrasena: Achus32
+   ID Profesional: 1111
+   DNI Profesional: 34.562.399 (Sin Puntos en el Programa)
+   Telefono Profesional: 3873624091
+
+2. Nombre y Apellido: Juan Gonzales
+   Nombre Usuario: jo97!AR
+   Contraseña: DORItO45
+   ID Profesional: 2222
+   DNI Profesional: 28.698.785
+   Telefono Profesional: 3873535701
+
+3. Nombre y Apellido: Alejo Diaz
+   Nombre Usuario: aBGH789
+   Contrasena: aLejo123
+   ID Profesional: 3333
+   DNI Profesional: 32.741.635
+   Telefono Profesional: 3873535928

@@ -12,6 +12,14 @@ struct Usuarios					//Sector del registro
 	char ApellidoYNombre[60];
 };
 
+struct Profesionales
+{
+	char ApellidoyNombre[60];
+	int IDProfesional;
+	int DNIProfesional;
+	char Telefono[25];
+};
+
 int Menu()					//Funcion del menú
 {
 	int opcion = 0;
@@ -34,7 +42,7 @@ bool VerificarNombreDeUsuario(Usuarios regi);
 bool ComienzaMinuscula(Usuarios regi);
 bool ContieneDosMayusculas(Usuarios regi);
 bool ContieneMaximoTresDigitos(Usuarios regi);
-int ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(FILE *archiprof, Usuarios regi, char UsuarioActual[10]);
+int ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(FILE *archiprof, Usuarios regi, char UsuarioActual[10], Profesionales pros);
 int ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(FILE *archirecep, Usuarios regi, char UsuarioActual[10]);
 															//Seccion de prototipos de funciones para la creacion del nuevo usuario
 bool VerificarContrasenia(Usuarios regi);						
@@ -46,6 +54,7 @@ bool DosLetrasConsecutivas(Usuarios regi);
 void RegistrarProfesional(FILE *archiprof, FILE *archirecep)		//Registrar Profesionales en el archivo Profesionales.dat
 {
 	Usuarios profesionales;
+	Profesionales pros;
 	int ComparacionProf;
 	int ComparacionRecep;
 	
@@ -84,12 +93,12 @@ void RegistrarProfesional(FILE *archiprof, FILE *archirecep)		//Registrar Profes
 	char NombreUsuarioProfesionalActual[10];
 	strcpy(NombreUsuarioProfesionalActual, "");
 	strcpy(NombreUsuarioProfesionalActual, profesionales.Usuario);
-	ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, profesionales, NombreUsuarioProfesionalActual);     //Estas dos funciones comparan el nombre
+	ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, profesionales, NombreUsuarioProfesionalActual, pros);     //Estas dos funciones comparan el nombre
 	ComparacionRecep = ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(archirecep, profesionales, NombreUsuarioProfesionalActual);  //de usuario actual con otro nombre de usuraio
 																																		 //en cualquiera de los dos archivos
 	while(!VerificarNombreDeUsuario(profesionales) or (ComparacionProf!=0) or (ComparacionRecep!=0))
 	{
-			printf("Nombre de Usuario erroneo\n");
+			printf("\nNombre de Usuario erroneo\n");
 			printf("Un nombre de Usuario requiere lo siguiente: ");
 			printf("\n\nDebe ser unico para cada profesional registrado");
 			printf("\nDebe comenzar con una letra minuscula");
@@ -100,7 +109,7 @@ void RegistrarProfesional(FILE *archiprof, FILE *archirecep)		//Registrar Profes
 			gets(profesionales.Usuario);
 			strcpy(NombreUsuarioProfesionalActual, "");
 			strcpy(NombreUsuarioProfesionalActual, profesionales.Usuario);
-			ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, profesionales, NombreUsuarioProfesionalActual);
+			ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, profesionales, NombreUsuarioProfesionalActual, pros);
 			ComparacionRecep = ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(archirecep, profesionales, NombreUsuarioProfesionalActual);
 	}
 	
@@ -122,7 +131,7 @@ void RegistrarProfesional(FILE *archiprof, FILE *archirecep)		//Registrar Profes
 		printf("\n\nDebe contener al menos una letra mayuscula, una minuscula y un digito (0 a 9)");
 		printf("\nNo debe contener signos especiales, solo caracteres alfanumericos");
 		printf("\nDebe contener entre 6 y 32 caracteres");
-		printf("\nNo debe contener 3 numeros consecutivos");
+		printf("\nNo debe contener mas de 3 numeros consecutivos");
 		printf("\nNo debe contener 2 letras consecutivas alfabeticamente");
 		printf("\n\nIngrese una nueva contrasena: ");
 		_flushall();
@@ -137,12 +146,27 @@ void RegistrarProfesional(FILE *archiprof, FILE *archirecep)		//Registrar Profes
 	printf("Ingrese Nombre y Apellido del profesional: ");
 	_flushall();
 	gets(profesionales.ApellidoYNombre);
+	strcpy(pros.ApellidoyNombre, profesionales.ApellidoYNombre);
+	
+	printf("Ingrese el ID del Profesional: ");
+	scanf("%d", &pros.IDProfesional);
+	
+	printf("Ingrese el DNI del Profesional: ");
+	scanf("%d", &pros.DNIProfesional);
+	
+	printf("Ingrese el telefono del Profesional: ");
+	_flushall();
+	gets(pros.Telefono);
+	
+	
+	
 	
 	
 	fseek(archiprof, 0, SEEK_END);
 	fwrite(&profesionales, sizeof(profesionales), 1, archiprof);
+	fwrite(&pros, sizeof(pros), 1, archiprof);
 	
-	printf("Nuevo Profesional agregado exitosamente..");
+	printf("\nNuevo Profesional agregado exitosamente..");
 	
 	fclose(archiprof);
 	fclose(archirecep);
@@ -151,6 +175,7 @@ void RegistrarProfesional(FILE *archiprof, FILE *archirecep)		//Registrar Profes
 void RegistrarRecepcionista(FILE *archirecep, FILE *archiprof)   //Registrar Recepcionistas en el archivo Recepcionistas.dat
 {
 	Usuarios recepcionistas;
+	Profesionales pros;
 	int ComparacionProf;
 	int ComparacionRecep;
 	
@@ -188,7 +213,7 @@ void RegistrarRecepcionista(FILE *archirecep, FILE *archiprof)   //Registrar Rec
 	char NombreUsuarioRecepcionistaActual[10];
 	strcpy(NombreUsuarioRecepcionistaActual, "");
 	strcpy(NombreUsuarioRecepcionistaActual, recepcionistas.Usuario);
-	ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, recepcionistas, NombreUsuarioRecepcionistaActual);		//Estas dos funciones comparan el
+	ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, recepcionistas, NombreUsuarioRecepcionistaActual, pros);		//Estas dos funciones comparan el
 	ComparacionRecep = ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(archirecep, recepcionistas, NombreUsuarioRecepcionistaActual);  //Nombre de usuario actual con los
 																															                //existentes en los archivos
 	while(!VerificarNombreDeUsuario(recepcionistas) or (ComparacionProf!=0) or (ComparacionRecep !=0))
@@ -204,7 +229,7 @@ void RegistrarRecepcionista(FILE *archirecep, FILE *archiprof)   //Registrar Rec
 			gets(recepcionistas.Usuario);
 			strcpy(NombreUsuarioRecepcionistaActual, "");
 			strcpy(NombreUsuarioRecepcionistaActual, recepcionistas.Usuario);
-			ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, recepcionistas, NombreUsuarioRecepcionistaActual);
+			ComparacionProf = ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(archiprof, recepcionistas, NombreUsuarioRecepcionistaActual, pros);
 			ComparacionRecep = ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(archirecep, recepcionistas, NombreUsuarioRecepcionistaActual);
 	}
 	
@@ -390,7 +415,7 @@ bool TresNumerosConsecutivos(Usuarios regi)
 	
 	for(i=0; i<longitudContra; i++)
 	{
-		if(isdigit(regi.Contrasena[i]) && isdigit(regi.Contrasena[i+1]) && isdigit(regi.Contrasena[i+2]))
+		if(isdigit(regi.Contrasena[i]) && isdigit(regi.Contrasena[i+1]) && isdigit(regi.Contrasena[i+2]) && isdigit(regi.Contrasena[i+3]))
 		return false;
 	}
 	return true;
@@ -480,7 +505,7 @@ bool ContieneMaximoTresDigitos(Usuarios regi)
 	}
 }
 
-int ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(FILE* archi, Usuarios regi, char UsuarioActual[10])
+int ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(FILE* archi, Usuarios regi, char UsuarioActual[10], Profesionales pros)
 {
 	int comparacion;
 	int Numero = 0;
@@ -488,6 +513,7 @@ int ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(FILE* archi, Usuarios re
 	rewind(archi);
 	
 	fread(&regi, sizeof(regi), 1, archi);
+	fread(&pros, sizeof(pros), 1, archi);
 	
 	while( !feof(archi) )
 	{
@@ -499,6 +525,7 @@ int ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(FILE* archi, Usuarios re
 			
 		}
 		fread(&regi, sizeof(regi), 1, archi);
+		fread(&pros, sizeof(pros), 1, archi);
 	}
 	return Numero;
 }
