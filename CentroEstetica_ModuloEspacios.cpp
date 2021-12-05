@@ -66,8 +66,8 @@ int Menu()
 int ComprobarNombreDeUsuarioUnicoEnArchivoProfesionales(FILE *archirecep, Usuarios regi, char UsuarioActual[10], char ContrasenaTarget[32], char NombreYApellido[60], Profesionales pros); 
 int ExtraerDNICliente(FILE *architurnos, int DiaActual, int MesActual, int AnoActual);								//PROTOTIPO DE FUNCIONES
 void ExtraerNombreYApellidoCliente(FILE *archiclient, char ApellidoYNombre[60], int DNICLIENTE);
-
-
+int ExtraerIDProfesional(FILE *architurnos, int DiaActual, int MesActual, int AnoActual);
+void ExtraerNombreProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, Turnos turno, int IDPRO, char ApyNom[60]);
 
 
 
@@ -172,24 +172,35 @@ void VisualizarListaDeEsperDeTurnos(FILE *architurnos, FILE *archiclient, int Di
 	
 	DNICLIENTE = ExtraerDNICliente(architurnos, DiaActual, MesActual, AnoActual);
 	
-	ExtraerNombreYApellidoCliente(archiclient, NombreyApellido, DNICLIENTE);
+	if(DNICLIENTE != 0)
+	{
+		ExtraerNombreYApellidoCliente(archiclient, NombreyApellido, DNICLIENTE);
 	
-	printf("\nEl cliente con turno en el dia (%d/%d/%d) es: %s", DiaActual, MesActual, AnoActual, NombreyApellido);
+		printf("\nEl cliente con turno en el dia (%d/%d/%d) es: %s", DiaActual, MesActual, AnoActual, NombreyApellido);
+	}
+	else
+	{
+		printf("\nNo hay un cliente con turno para esta fecha");
+	}
+	
 	
 	fclose(architurnos);
 	fclose(archiclient);
 	
 }
 	
-void RegistrarEvolucionDeTratamiento(FILE *architurnos, FILE *archiclient, char NombreyApellido[60], int DiaActual, int MesActual, int AnoActual)
+void RegistrarEvolucionDeTratamiento(FILE *architurnos, FILE *archiclient, FILE *archiprof, char NombreyApellido[60], int DiaActual, int MesActual, int AnoActual)
 {
 	Turnos turno;
 	Cliente clientes;
+	Usuarios usuario;
+	Profesionales pros;
 	
 	char ClienteActual[60];
 	strcpy(ClienteActual, "");
 	int Comparacion;
 	int DNICLIENTE;
+	int IDPRO = 0;
 	
 	architurnos = fopen("Turnos.dat", "r+b");
 	
@@ -216,6 +227,20 @@ void RegistrarEvolucionDeTratamiento(FILE *architurnos, FILE *archiclient, char 
 			exit(1);
 		}
 	}
+	
+	archiprof = fopen("Profesionales.dat", "r+b");
+	
+	if (archiprof == NULL)
+	{
+		archiprof = fopen("Profesionales.dat", "w+b");				//Abrir archivo Profesionales.dat
+		
+		if (archiprof == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
+	
 	
 	printf("\nIngrese el nombre del cliente al que va a llamar para ser atendido: ");
 	_flushall();
@@ -261,8 +286,21 @@ void RegistrarEvolucionDeTratamiento(FILE *architurnos, FILE *archiclient, char 
 	}
 	
 	
+	printf("\n\n");
+	system("pause");
+	system("cls");
+	
+	strcpy(NombreyApellido, "");
+	IDPRO =	ExtraerIDProfesional(architurnos, DiaActual, MesActual, AnoActual);
+	
+	ExtraerNombreProfesional(archiprof, usuario, pros, turno, IDPRO, NombreyApellido);
 	
 	
+	
+	printf("El profesional que atendio al cliente fue: %s\n", NombreyApellido);
+	printf("\nla fecha de atencion fue: %d/%d/%d\n", DiaActual, MesActual, AnoActual);
+	printf("\nEl redacto de la evolucion del tratamiento fue:\n");
+	printf("%s", turno.DetalleDeAtencion);
 	
 	
 	fclose(architurnos);
@@ -324,7 +362,7 @@ main()
 
 			case 3: {
 						printf("Registrar Evolucion del Tratamiento\n");
-						RegistrarEvolucionDeTratamiento(Turnos, Clientes, NombreyApellido, DiaActualidad, MesActualidad, AnoActualidad);
+						RegistrarEvolucionDeTratamiento(Turnos, Clientes, Profesionales, NombreyApellido, DiaActualidad, MesActualidad, AnoActualidad);
 						break;
 					}
 
@@ -391,6 +429,7 @@ int ExtraerDNICliente(FILE *architurnos, int DiaActual, int MesActual, int AnoAc
 		{																													   //Que tiene turno ese dia
 			DNICLIENTE = turno.DNIcliente;
 		}
+		
 		fread(&turno, sizeof(turno), 1, architurnos);
 	}
 	
@@ -411,10 +450,48 @@ void ExtraerNombreYApellidoCliente(FILE *archiclient, char ApellidoYNombre[60], 
 		{
 			strcpy(ApellidoYNombre, clientes.ApellidoYNombre);
 		}
+		
 		fread(&clientes, sizeof(clientes), 1, archiclient);
 	}
 }
 
+int ExtraerIDProfesional(FILE *architurnos, int DiaActual, int MesActual, int AnoActual)
+{
+	Turnos turno;
+	int IDPROFESIONAL = 0;
+	
+	rewind(architurnos);
+	
+	fread(&turno, sizeof(turno), 1, architurnos);
+	
+	while ( !feof(architurnos) )
+	{
+		if((turno.borrado == false && turno.FechaTurno.dd == DiaActual) && (turno.FechaTurno.mm == MesActual) && (turno.FechaTurno.aaaa == AnoActual))
+		{
+			IDPROFESIONAL = turno.IdProfesional;
+		}
+		fread(&turno, sizeof(turno), 1, architurnos);
+	}
+	return IDPROFESIONAL;
+}
 
+
+void ExtraerNombreProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, Turnos turno, int IDPRO, char ApyNom[60])
+{
+	rewind(archiprof);
+	
+	fread(&regi, sizeof(regi), 1, archiprof);
+	fread(&pros, sizeof(pros), 1, archiprof);
+	
+	while( !feof(archiprof) )
+	{
+		if(IDPRO == pros.IDProfesional)
+		{
+			strcpy(ApyNom, pros.ApellidoyNombre);
+		}
+		fread(&regi, sizeof(regi), 1, archiprof);
+		fread(&pros, sizeof(pros), 1, archiprof);
+	}
+}
 
 //Este código fue realizado por Casanueva Facundo Gabriel; comisión 1K2
