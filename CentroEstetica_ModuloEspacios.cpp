@@ -204,12 +204,18 @@ void RegistrarEvolucionDeTratamiento(FILE *architurnos, FILE *archiclient, char 
 		}
 	}
 	
+	archiclient = fopen("Clientes.dat", "r+b");
 	
-	
-	
-	
-	
-	
+	if (archiclient == NULL)
+	{
+		archiclient = fopen("Clientes.dat", "w+b");		//Apertura del archivo Clienets.dat
+		
+		if (archiclient == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
 	
 	printf("\nIngrese el nombre del cliente al que va a llamar para ser atendido: ");
 	_flushall();
@@ -249,6 +255,7 @@ void RegistrarEvolucionDeTratamiento(FILE *architurnos, FILE *archiclient, char 
 			
 			fseek(architurnos, (long) -sizeof(turno), SEEK_CUR);
 			fwrite(&turno, sizeof(turno), 1, architurnos);
+			break;
 		}
 		fread(&turno, sizeof(turno), 1, architurnos);
 	}
@@ -259,6 +266,7 @@ void RegistrarEvolucionDeTratamiento(FILE *architurnos, FILE *archiclient, char 
 	
 	
 	fclose(architurnos);
+	fclose(archiclient);
 	
 }
 	

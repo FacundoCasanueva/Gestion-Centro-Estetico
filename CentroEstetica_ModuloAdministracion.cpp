@@ -4,6 +4,13 @@
 #include <conio.h>
 #include <ctype.h>
 
+struct Fecha
+{
+	int dd;
+	int mm;
+	int aaaa;
+};
+
 
 struct Usuarios					//Sector del registro
 {
@@ -19,6 +26,21 @@ struct Profesionales
 	int DNIProfesional;
 	char Telefono[25];
 };
+
+struct Turnos
+{
+	int IdProfesional;
+	Fecha FechaTurno;
+	int DNIcliente;
+	char DetalleDeAtencion[380];
+	bool borrado;
+};
+
+
+
+
+
+
 
 int Menu()					//Funcion del menú
 {
@@ -50,6 +72,11 @@ bool ContraseniaMayusculaMinusculaNumero(Usuarios regi);
 bool ContraseniaSignosEspeciales(Usuarios regi);
 bool TresNumerosConsecutivos(Usuarios regi);
 bool DosLetrasConsecutivas(Usuarios regi);
+
+int VerificarCuantosTurnosPorProfesional(FILE *architurnos, int IDACTUAL, int MesActual);
+
+
+
 
 void RegistrarProfesional(FILE *archiprof, FILE *archirecep)		//Registrar Profesionales en el archivo Profesionales.dat
 {
@@ -278,7 +305,35 @@ void RegistrarRecepcionista(FILE *archirecep, FILE *archiprof)   //Registrar Rec
 	
 }
 
-
+void AtencionesPorProfesionalEnMesEnCurso(FILE *architurnos, int MesActual)
+{
+	Turnos turno;
+	int IDACTUAL;
+	int TurnosPorProfesional = 0;
+	
+	architurnos = fopen("Turnos.dat", "r+b");
+	
+	if (architurnos == NULL)
+	{
+		architurnos = fopen("Turnos.dat", "w+b");		//Apertura del archivo Turnos.dat
+		
+		if (architurnos == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
+	
+	printf("Indique el ID del profesional del que se quiere visualizar los turnos realizados en el mes en curso: ");
+	scanf("%d", &IDACTUAL);
+	
+	TurnosPorProfesional = VerificarCuantosTurnosPorProfesional(architurnos, IDACTUAL, MesActual);
+	
+	printf("La cantidad de Turnos realizados por el profesional de ID (%d) son: %d", IDACTUAL, TurnosPorProfesional);
+	
+	
+	fclose(architurnos);
+}
 
 
 
@@ -289,7 +344,22 @@ main()										//Función Main
 	int opc = 0;
 	FILE *Profesionales;
 	FILE *Recepcionistas;
+	FILE *Turnos;
 	
+	int DiaActualidad;
+	int MesActualidad;
+	int AnoActualidad;
+	
+	
+	printf("Bienvenido al sistema de Administracion\n\n");
+	
+	printf("Ingrese la fecha actual");
+	printf("\ndd: "); 
+	scanf("%d", &DiaActualidad);
+	printf("mm: ");
+	scanf("%d", &MesActualidad);
+	printf("aaaa: ");
+	scanf("%d", &AnoActualidad);
 	
 	
 	do 
@@ -314,6 +384,7 @@ main()										//Función Main
 
 			case 3: {
 						printf("Atenciones por Profesional\n");
+						AtencionesPorProfesionalEnMesEnCurso(Turnos, MesActualidad);
 						break;
 					}
 
@@ -553,5 +624,26 @@ int ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(FILE* archi, Usuarios r
 	return Numero;
 }
 
+int VerificarCuantosTurnosPorProfesional(FILE *architurnos, int IDACTUAL, int MesActual)
+{
+	Turnos turno;
+	int TurnosFinalizados;
+	
+	rewind(architurnos);
+	
+	fread(&turno, sizeof(turno), 1, architurnos);
+	
+	while( !feof(architurnos) )
+	{
+		if(turno.borrado == true && turno.FechaTurno.mm == MesActual && IDACTUAL == turno.IdProfesional)
+		{
+			TurnosFinalizados++;
+		}
+		fread(&turno, sizeof(turno), 1, architurnos);
+	}
+	
+	
+	return TurnosFinalizados;
+}
 
 //Este código fue realizado por Casanueva Facundo Gabriel; comisión 1K2
