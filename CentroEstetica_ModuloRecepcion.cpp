@@ -25,9 +25,10 @@ struct Cliente
 struct Turnos
 {
 	int IdProfesional;
-	Fecha Fechaactual;
+	Fecha FechaTurno;
 	int DNIcliente;
 	char DetalleDeAtencion[380];
+	bool borrado;
 };
 
 struct Usuarios					
@@ -66,7 +67,7 @@ int Menu()					//Funcion del menú
 int ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(FILE *archirecep, Usuarios regi, char UsuarioActual[10], char ContrasenaTarget[32], char NombreYApellido[60]);
 int ComprobarIDProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, int IDActual, char NombredelProfesional[60]);						//PROTOTIPO DE FUNCIONES
 int ComprobarDNIClientes(FILE *archiclient, Cliente clientes, int DNIClienteActual, char NombreCliente[60]);
-
+int CalcularEdad(int DiaNacimiento, int MesNacimiento, int AnoNacimiento, int DiaActual, int MesActual, int AnoActual);
 
 
 
@@ -130,13 +131,15 @@ void IniciarSesionRecepcionista(FILE *archirecep) //Inicio de sesion
 	printf("\nContrasena valida\n\n");
 	
 	
-	printf("Bienvenido al sistema %s", ApellidoYNombre);	
+	printf("Bienvenido al sistema %s", ApellidoYNombre);
+	fclose(archirecep);	
 }
 
-void RegistrarClientes(FILE *archiclient)//Registro De Clientes
+void RegistrarClientes(FILE *archiclient, int DiaActual, int MesActual, int AnoActual)//Registro De Clientes
 {
 	Cliente clientes;
-	
+	int EdadCliente;
+		
 	archiclient = fopen("Clientes.dat", "r+b");
 	
 	if (archiclient == NULL)
@@ -172,6 +175,11 @@ void RegistrarClientes(FILE *archiclient)//Registro De Clientes
 	scanf("%d", &clientes.FechaDeNacimiento.mm);
 	printf("aaaa: ");
 	scanf("%d", &clientes.FechaDeNacimiento.aaaa);
+	EdadCliente = CalcularEdad(clientes.FechaDeNacimiento.dd, clientes.FechaDeNacimiento.mm, clientes.FechaDeNacimiento.aaaa, DiaActual, MesActual, AnoActual);
+	printf("La edad del cliente es de %d anios\n", EdadCliente);
+	
+	
+	
 	
 	printf("\nIngrese el peso del cliente: ");
 	scanf("%f", &clientes.Peso);
@@ -266,11 +274,11 @@ void RegistrarTurnos(FILE *architurnos, FILE *archiprof, FILE *archiclient)
 	
 	printf("\nIngrese la fecha del turno");
 	printf("\ndd: ");
-	scanf("%d", &turnos.Fechaactual.dd);
+	scanf("%d", &turnos.FechaTurno.dd);
 	printf("mm: ");
-	scanf("%d", &turnos.Fechaactual.mm);
+	scanf("%d", &turnos.FechaTurno.mm);
 	printf("aaaa: ");
-	scanf("%d", &turnos.Fechaactual.aaaa);
+	scanf("%d", &turnos.FechaTurno.aaaa);
 	
 	system("pause");
 	system("cls");
@@ -292,6 +300,8 @@ void RegistrarTurnos(FILE *architurnos, FILE *archiprof, FILE *archiclient)
 	
 	strcpy(turnos.DetalleDeAtencion, "");
 	
+	turnos.borrado = false;
+	
 	fseek(architurnos, 0, SEEK_END);
 	fwrite(&turnos, sizeof(turnos), 1, architurnos);
 	
@@ -311,6 +321,20 @@ main()
 	FILE *Clientes;
 	FILE *Turnos;
 	FILE *Profesionales;
+	int DiaActualidad;
+	int MesActualidad;
+	int AnoActualidad;
+	
+	printf("Bienvenido al sistema de recepcion\n\n");
+	
+	printf("Ingrese la fecha actual para poder calcular la edad de los clientes que se registren");
+	printf("\ndd: ");
+	scanf("%d", &DiaActualidad);
+	printf("mm: ");
+	scanf("%d", &MesActualidad);
+	printf("aaaa: ");
+	scanf("%d", &AnoActualidad);
+	
 	
 	
 	do 
@@ -329,7 +353,7 @@ main()
 		
 			case 2: {
 						printf("Registrar Cliente\n\n");
-						RegistrarClientes(Clientes);
+						RegistrarClientes(Clientes, DiaActualidad, MesActualidad, AnoActualidad);
 						break;
 					}
 
@@ -433,10 +457,31 @@ int ComprobarDNIClientes(FILE *archiclient, Cliente clientes, int DNIClienteActu
 	return Numero;
 }
 
+int CalcularEdad(int DiaNacimiento, int MesNacimiento, int AnoNacimiento, int DiaActual, int MesActual, int AnoActual)
+{
+	int mes[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	
+	if(DiaNacimiento > DiaActual)
+	{
+		DiaActual = DiaActual + mes[MesNacimiento - 1];
+		MesActual = MesActual - 1;
+	}
+	
+	if(MesNacimiento > MesActual)
+	{
+		AnoActual = AnoActual - 1;
+		MesActual = MesActual + 12;
+	}
+	
+	
+	int AnoCalculado = AnoActual - AnoNacimiento;
+	
+	return AnoCalculado;
+	
+}
 
 
 
 
 
-
-
+//Este código fue realizado por Casanueva Facundo Gabriel; comisión 1K2
