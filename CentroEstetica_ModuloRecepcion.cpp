@@ -68,6 +68,10 @@ int ComprobarNombreDeUsuarioUnicoEnArchivoRecepcionistas(FILE *archirecep, Usuar
 int ComprobarIDProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, int IDActual, char NombredelProfesional[60]);						//PROTOTIPO DE FUNCIONES
 int ComprobarDNIClientes(FILE *archiclient, Cliente clientes, int DNIClienteActual, char NombreCliente[60]);
 int CalcularEdad(int DiaNacimiento, int MesNacimiento, int AnoNacimiento, int DiaActual, int MesActual, int AnoActual);
+int ExtraerIDProfesional(FILE *architurnos, int DiaActual, int MesActual, int AnoActual);
+void ExtraerNombreProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, Turnos turno, int IDPRO, char ApyNom[60]);
+
+
 
 
 
@@ -312,7 +316,70 @@ void RegistrarTurnos(FILE *architurnos, FILE *archiprof, FILE *archiclient)
 	fclose(archiclient);
 }
 
+void InformeClientesAtendidos(FILE *architurnos, FILE *archiprof, int DiaActual, int MesActual, int AnoActual)
+{
+	Turnos turno;
+	Usuarios usuario;
+	Profesionales pros;
+	
+	char ApynomProf;
+	char ApyNomClient;
+	int IDPRO;
+	char ApyNom[60];
+	
+	architurnos = fopen("Turnos.dat", "r+b");
+	
+	if (architurnos == NULL)
+	{
+		architurnos = fopen("Turnos.dat", "w+b");		//Apertura del archivo recepcionistas.dat
+		
+		if (architurnos == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
+	
+	archiprof = fopen("Profesionales.dat", "r+b");
+	
+	if (archiprof == NULL)
+	{
+		archiprof = fopen("Profesionales.dat", "w+b");				//Abrir archivo Profesionales.dat
+		
+		if (archiprof == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
+	
+	IDPRO = ExtraerIDProfesional(architurnos, DiaActual, MesActual, AnoActual);
+	
+	if(IDPRO != 0)
+	{
+		ExtraerNombreProfesional(archiprof, usuario, pros, turno, IDPRO, ApyNom);
 
+		rewind(architurnos);
+			
+		fread(&turno, sizeof(turno), 1, architurnos);
+		
+		while( !feof(architurnos) )
+		{
+			if(turno.borrado == true)
+			{
+				printf("El Profesional de ID %d, llamado %s atendio a un cliente en la fecha %d/%d/%d", IDPRO, ApyNom, turno.FechaTurno.dd, turno.FechaTurno.mm, turno.FechaTurno.aaaa);
+			}
+			fread(&turno, sizeof(turno), 1, architurnos);
+		}
+	}
+	else
+	{
+		printf("\nNingun Profesional atendio a un cliente en esta fecha");
+	}
+	
+	fclose(architurnos);
+	fclose(archiprof);
+}
 
 main()
 {
@@ -365,6 +432,7 @@ main()
 
 			case 4: {
 						printf("Listado de atenciones por Profesional y Fecha\n\n");
+						InformeClientesAtendidos(Turnos, Profesionales, DiaActualidad, MesActualidad, AnoActualidad);
 						break;
 					}
 					
@@ -480,6 +548,44 @@ int CalcularEdad(int DiaNacimiento, int MesNacimiento, int AnoNacimiento, int Di
 	
 }
 
+int ExtraerIDProfesional(FILE *architurnos, int DiaActual, int MesActual, int AnoActual)
+{
+	Turnos turno;
+	int IDPROFESIONAL = 0;
+	
+	rewind(architurnos);
+	
+	fread(&turno, sizeof(turno), 1, architurnos);
+	
+	while ( !feof(architurnos) )
+	{
+		if((turno.borrado == true && turno.FechaTurno.dd == DiaActual) && (turno.FechaTurno.mm == MesActual) && (turno.FechaTurno.aaaa == AnoActual))
+		{
+			IDPROFESIONAL = turno.IdProfesional;
+		}
+		fread(&turno, sizeof(turno), 1, architurnos);
+	}
+	return IDPROFESIONAL;
+}
+
+
+void ExtraerNombreProfesional(FILE *archiprof, Usuarios regi, Profesionales pros, Turnos turno, int IDPRO, char ApyNom[60])
+{
+	rewind(archiprof);
+	
+	fread(&regi, sizeof(regi), 1, archiprof);
+	fread(&pros, sizeof(pros), 1, archiprof);
+	
+	while( !feof(archiprof) )
+	{
+		if(IDPRO == pros.IDProfesional)
+		{
+			strcpy(ApyNom, pros.ApellidoyNombre);
+		}
+		fread(&regi, sizeof(regi), 1, archiprof);
+		fread(&pros, sizeof(pros), 1, archiprof);
+	}
+}
 
 
 
