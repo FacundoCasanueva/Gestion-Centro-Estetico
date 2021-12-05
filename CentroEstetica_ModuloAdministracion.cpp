@@ -335,7 +335,14 @@ void AtencionesPorProfesionalEnMesEnCurso(FILE *architurnos, int MesActual)
 	fclose(architurnos);
 }
 
-
+void VerificarQuienRecibeElBono(FILE *architurnos, int MesActual)
+{
+	Turnos turno;
+	int IDACTUAL;
+	int TurnosPorProfesional = 0;
+	
+	
+}
 
 
 
@@ -397,13 +404,7 @@ main()										//Función Main
 						printf("Saliendo de la Aplicacion");
 						break;
 					}
-		/*			
-			case 8: {
-						printf("Listar\n\n");
-						
-						break;
-					}
-*/
+		
 			default: {
 						printf("Error. Opcion incorrecta...");
 						break;
