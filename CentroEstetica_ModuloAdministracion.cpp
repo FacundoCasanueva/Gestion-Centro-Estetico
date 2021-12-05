@@ -339,9 +339,62 @@ void VerificarQuienRecibeElBono(FILE *architurnos, int MesActual)
 {
 	Turnos turno;
 	int IDACTUAL;
-	int TurnosPorProfesional = 0;
+	int TurnosProfesionalUno;
+	int TurnosProfesionalDos;
+	int TurnosProfesionalTres;
+	
+	architurnos = fopen("Turnos.dat", "r+b");
+	
+	if (architurnos == NULL)
+	{
+		architurnos = fopen("Turnos.dat", "w+b");		//Apertura del archivo Turnos.dat
+		
+		if (architurnos == NULL)
+		{
+			printf("Error. No se pudo crear el archivo");
+			exit(1);
+		}
+	}
+	
+	rewind(architurnos);
+	
+	fread(&turno, sizeof(turno), 1, architurnos);
+	
+	while( !feof(architurnos) )
+	{
+		if(turno.borrado == true && turno.IdProfesional == 1111)
+		{
+			TurnosProfesionalUno++;
+		}
+		else if(turno.borrado == true && turno.IdProfesional == 2222)
+		{
+			TurnosProfesionalDos++;
+		}
+		else if(turno.borrado == true && turno.IdProfesional == 3333)
+		{
+			TurnosProfesionalTres++;
+		}
+		fread(&turno, sizeof(turno), 1, architurnos);
+	}
+	
+	if(TurnosProfesionalUno > TurnosProfesionalDos && TurnosProfesionalUno > TurnosProfesionalTres)
+	{
+		printf("El profesional al que se le otorga el bonus es al profesional de ID 1111, por atender a %d clientes", TurnosProfesionalUno);
+	}
+	else if(TurnosProfesionalDos > TurnosProfesionalUno && TurnosProfesionalDos > TurnosProfesionalTres)
+	{
+		printf("El profesional al que se le otorga el bonus es al profesional de ID 2222, por atender a %d clientes", TurnosProfesionalDos);
+	}
+	else if(TurnosProfesionalTres > TurnosProfesionalUno && TurnosProfesionalTres > TurnosProfesionalDos)
+	{
+		printf("El profesional al que se le otorga el bonus es al profesional de ID 3333, por atender a %d clientes", TurnosProfesionalTres);
+	}
 	
 	
+	
+	
+	
+	fclose(architurnos);
 }
 
 
@@ -396,7 +449,8 @@ main()										//Función Main
 					}
 
 			case 4: {
-						printf("Ranking de profesionales por Atenciones");
+						printf("Ranking de profesionales por Atenciones\n");
+						VerificarQuienRecibeElBono(Turnos, MesActualidad);
 						break;
 					}
 					
